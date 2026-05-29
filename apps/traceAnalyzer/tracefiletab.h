@@ -116,6 +116,7 @@ private:
 public Q_SLOTS:
     void tracefileChanged();
     void on_latencyTreeView_doubleClicked(const QModelIndex& index);
+    void on_latencyTreeView_clicked(const QModelIndex& index);
     void on_startLatencyAnalysis_clicked();
     void on_startPowerAnalysis_clicked();
 

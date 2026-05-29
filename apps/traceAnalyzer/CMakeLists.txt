@@ -99,3 +99,44 @@ target_link_libraries(TraceAnalyzer
 )
 
 install(TARGETS TraceAnalyzer)
+
+########################################
+###   TraceAnalyzer Premium Extension ###
+########################################
+
+option(DRAMSYS_BUILD_TRACE_ANALYZER_EXTENSION
+    "Build premium Trace Analyzer extension (Latency / Power analysis)" OFF)
+
+if(DRAMSYS_BUILD_TRACE_ANALYZER_EXTENSION)
+    add_library(traceanalyzer_extension STATIC
+        extension/latency/latencyanalysis.cpp
+        extension/latency/latencymodel.cpp
+        extension/latency/latencyplot.cpp
+        extension/latency/latencyworker.cpp
+    )
+
+    # Expose EXTENSION_ENABLED so the open-source #ifdef stubs are compiled in.
+    target_compile_definitions(traceanalyzer_extension PUBLIC EXTENSION_ENABLED)
+
+    # The extension's own headers plus the open-source headers it depends on.
+    target_include_directories(traceanalyzer_extension
+        PUBLIC
+            ${CMAKE_CURRENT_SOURCE_DIR}/extension  # makes <plots.h> resolvable
+            ${CMAKE_CURRENT_SOURCE_DIR}             # open-source headers
+    )
+
+    target_link_libraries(traceanalyzer_extension
+        PUBLIC
+            Qt5::Widgets
+            Qt5::Sql
+            Qwt::Qwt
+    )
+
+    # Link the extension into the main executable.
+    target_link_libraries(TraceAnalyzer PRIVATE traceanalyzer_extension)
+
+    message(STATUS "TraceAnalyzer: premium extension ENABLED")
+else()
+    message(STATUS "TraceAnalyzer: premium extension disabled (open-source build)")
+endif()
+

@@ -14,3 +14,11 @@ build*/
 CMakeUserPresets.json
 extensions/
 *.code-workspace
+_deps/*
+**/CMakeFiles/**
+cmake_install.cmake
+CMakeCache.txt
+SystemCLanguageTargets.cmake
+compile_commands.json
+apps/simulator/Makefile
+Makefile

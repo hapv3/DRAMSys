@@ -218,6 +218,7 @@ void TraceFileTab::addDisclaimer()
     ui->startLatencyAnalysis->setEnabled(false);
     ui->latencyPlot->setEnabled(false);
     ui->latencyTreeView->setEnabled(false);
+    ui->latencyStatsLabel->setEnabled(false);
 
     // Power analysis
     auto* powerDisclaimerLabel = disclaimerLabel();
@@ -345,15 +346,20 @@ bool TraceFileTab::eventFilter(QObject* object, QEvent* event)
 
 void TraceFileTab::on_latencyTreeView_doubleClicked(const QModelIndex& index)
 {
-    // Get onlye the leaf:
-    if (index.column() == 0 && index.model()->hasChildren(index) == false)
-    {
-        unsigned int id = index.data().toUInt();
-        if (id != 0)
-        {
-            navigator->selectTransaction(id);
-        }
-    }
+    on_latencyTreeView_clicked(index);
+}
+
+void TraceFileTab::on_latencyTreeView_clicked(const QModelIndex& index)
+{
+    if (!index.isValid())
+        return;
+    // Read the Transaction ID from ColName (column 0) of the same row,
+    // regardless of which column was actually clicked.
+    QModelIndex idIndex = index.sibling(index.row(), 0);
+    bool ok = false;
+    unsigned int id = idIndex.data().toUInt(&ok);
+    if (ok && id != 0)
+        navigator->selectTransaction(id);
 }
 
 void TraceFileTab::on_startLatencyAnalysis_clicked()
