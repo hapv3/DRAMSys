@@ -10,6 +10,7 @@
 #define PLOTS_H
 
 #include "latency/latencyanalysis.h"
+#include "power/poweranalysis.h"
 #include "businessObjects/tracetime.h"
 
 #include <QLabel>
@@ -17,59 +18,59 @@
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QTreeView>
+#include <QWidget>
 
-// ---------------------------------------------------------------------------
-// Forward declarations for future extensions (power, bandwidth, buffer)
-// ---------------------------------------------------------------------------
-class QProgressBar;
-class QTreeView;
 class QwtPlot;
-class QLabel;
 
 namespace TraceAnalyzerExtension
 {
 
 /**
- * Adapter matching the original open-source stub signature:
- *
- *   TraceAnalyzerExtension::latencyAnalysis(db, progressBar, treeView, plot)
- *
- * The adapter reads clkPeriod from GeneralInfo stored in the database and
- * looks for a QLabel named "latencyStatsLabel" as a sibling of treeView
- * to display the percentile summary.
+ * Adapter for latencyAnalysis: reads clkPeriod from GeneralInfo and
+ * finds the latencyStatsLabel sibling widget automatically.
  */
 inline void latencyAnalysis(QSqlDatabase  db,
                             QProgressBar* progressBar,
                             QTreeView*    treeView,
                             QwtPlot*      histogramPlot)
 {
-    // Read clock period from GeneralInfo table.
     traceTime clkPeriod = 1000; // default: 1 ns
     {
         QSqlQuery q(db);
-        if (q.exec("SELECT Clk FROM GeneralInfo") && q.first())
+        if (q.exec("SELECT clk FROM GeneralInfo") && q.first())
             clkPeriod = static_cast<traceTime>(q.value(0).toLongLong());
     }
 
-    // Locate the optional stats label: look for a QLabel sibling widget.
     QLabel* statsLabel = nullptr;
     if (treeView && treeView->parentWidget())
-    {
         statsLabel = treeView->parentWidget()->findChild<QLabel*>("latencyStatsLabel");
-    }
 
     latencyAnalysis(db, clkPeriod, progressBar, treeView, histogramPlot, statsLabel);
 }
 
 /**
- * Power / Bandwidth / Buffer analysis — stub for future implementation.
+ * Adapter for powerAnalysis: finds progressBar and statsLabel from
+ * the widget hierarchy of the Power tab automatically.
  */
-inline void powerAnalysis(QSqlDatabase /*db*/,
-                          QwtPlot*     /*powerPlot*/,
-                          QwtPlot*     /*bandwidthPlot*/,
-                          QwtPlot*     /*bufferPlot*/)
+inline void powerAnalysis(QSqlDatabase db,
+                          QwtPlot*     powerPlot,
+                          QwtPlot*     bandwidthPlot,
+                          QwtPlot*     bufferPlot)
 {
-    // TODO: implement in Feature 1.2
+    QProgressBar* pb    = nullptr;
+    QLabel*       label = nullptr;
+
+    // Walk up to the tab widget to find siblings
+    QWidget* tab = powerPlot ? powerPlot->parentWidget() : nullptr;
+    while (tab)
+    {
+        pb    = tab->findChild<QProgressBar*>("powerAnalysisProgressBar");
+        label = tab->findChild<QLabel*>("powerStatsLabel");
+        if (pb || label) break;
+        tab = tab->parentWidget();
+    }
+
+    powerAnalysis(db, pb, powerPlot, bandwidthPlot, bufferPlot, label);
 }
 
 } // namespace TraceAnalyzerExtension

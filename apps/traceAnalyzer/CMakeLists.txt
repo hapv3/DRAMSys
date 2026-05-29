@@ -113,6 +113,9 @@ if(DRAMSYS_BUILD_TRACE_ANALYZER_EXTENSION)
         extension/latency/latencymodel.cpp
         extension/latency/latencyplot.cpp
         extension/latency/latencyworker.cpp
+        extension/power/poweranalysis.cpp
+        extension/power/powerplot.cpp
+        extension/power/powerworker.cpp
     )
 
     # Expose EXTENSION_ENABLED so the open-source #ifdef stubs are compiled in.

@@ -380,13 +380,36 @@
        <layout class="QGridLayout" name="gridLayout_4">
         <item row="2" column="0">
          <layout class="QVBoxLayout" name="powerLayout">
-          <item>
-           <widget class="QPushButton" name="startPowerAnalysis">
-            <property name="text">
-             <string>Start Analysis</string>
-            </property>
-           </widget>
-          </item>
+           <item>
+            <widget class="QPushButton" name="startPowerAnalysis">
+             <property name="text">
+              <string>Start Analysis</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QProgressBar" name="powerAnalysisProgressBar">
+             <property name="value">
+              <number>0</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="powerStatsLabel">
+             <property name="text">
+              <string>Click &quot;Start Analysis&quot; to compute power and bandwidth statistics.</string>
+             </property>
+             <property name="textFormat">
+              <enum>Qt::RichText</enum>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+             </property>
+            </widget>
+           </item>
           <item>
            <widget class="QGroupBox" name="powerBox">
             <property name="title">
