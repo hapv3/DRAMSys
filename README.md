@@ -4,6 +4,12 @@
 
 \>> [Official Website](http://dramsys.de) <<
 
+## Recent Updates (Compared to original version)
+- **Alt to measure duration - powered by AI
+- **Advanced Metrics Framework - powered by AI
+- **Power-Bandwidth-Buffer-Utilization-Analysis-Powered-ny-AI**
+- **Latency-Analysis-feature.-Power-by-AI**
+
 ## Disclaimer
 
 This is the public read-only mirror of an internal DRAMSys repository. Pull requests will not be merged but the changes might be added internally and published with a future commit. Both repositories are synchronized from time to time.

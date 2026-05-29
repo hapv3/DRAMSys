@@ -1,5 +1,4 @@
-// Copyright (c) 2024, RPTU Kaiserslautern-Landau / Fraunhofer IESE
-// Premium extension — not for redistribution.
+
 
 #ifndef ADVANCEDMETRICSUI_H
 #define ADVANCEDMETRICSUI_H

@@ -1,5 +1,4 @@
-// Copyright (c) 2024, RPTU Kaiserslautern-Landau / Fraunhofer IESE
-// Premium extension — not for redistribution.
+
 
 #include "latencyanalysis.h"
 #include "latencymodel.h"

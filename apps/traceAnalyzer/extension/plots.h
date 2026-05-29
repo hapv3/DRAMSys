@@ -1,5 +1,4 @@
-// Copyright (c) 2024, RPTU Kaiserslautern-Landau / Fraunhofer IESE
-// Premium extension public API — not for redistribution.
+
 //
 // This header is the single include used by the open-source code:
 //   #ifdef EXTENSION_ENABLED
