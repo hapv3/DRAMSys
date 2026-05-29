@@ -323,6 +323,15 @@ void TracePlot::setUpZoom()
     zoomZone->setZ(2);
     zoomZone->attach(this);
     zoomZone->setVisible(false);
+    
+    measureZone = new QwtPlotZoneItem();
+    measureZone->setZ(2);
+    QColor measureColor(Qt::cyan);
+    measureColor.setAlpha(80);
+    measureZone->setBrush(measureColor);
+    measureZone->setPen(Qt::cyan);
+    measureZone->attach(this);
+    measureZone->setVisible(false);
 }
 
 void TracePlot::updateScrollbar()
@@ -502,6 +511,21 @@ void TracePlot::exitZoomMode()
     mouseDownData.mouseIsDownForZooming = false;
     mouseLabel->setMode(MouseLabelMode::AbsoluteTime);
     zoomZone->setVisible(false);
+}
+
+void TracePlot::enterMeasureMode()
+{
+    mouseDownData.mouseIsDownForMeasuring = true;
+    mouseLabel->setMode(MouseLabelMode::Timedifference);
+    measureZone->setVisible(true);
+    measureZone->setInterval(mouseDownData.zoomSpan.Begin(), mouseDownData.zoomSpan.End());
+}
+
+void TracePlot::exitMeasureMode()
+{
+    mouseDownData.mouseIsDownForMeasuring = false;
+    mouseLabel->setMode(MouseLabelMode::AbsoluteTime);
+    measureZone->setVisible(false);
 }
 void TracePlot::zoomIn(traceTime zoomCenter)
 {
@@ -748,6 +772,8 @@ void TracePlot::keyPressEvent(QKeyEvent* keyPressedEvent)
         keyPressData.ctrlPressed = true;
     else if (Qt::Key_Shift == key)
         keyPressData.shiftPressed = true;
+    else if (Qt::Key_Alt == key)
+        keyPressData.altPressed = true;
     else if (Qt::Key_Right == key)
         navigator->selectNextTransaction();
     else if (Qt::Key_Left == key)
@@ -772,6 +798,12 @@ void TracePlot::keyReleaseEvent(QKeyEvent* keyReleasedEvent)
     {
         keyPressData.shiftPressed = false;
         exitZoomMode();
+        replot();
+    }
+    else if (Qt::Key_Alt == key)
+    {
+        keyPressData.altPressed = false;
+        exitMeasureMode();
         replot();
     }
 }
@@ -807,6 +839,16 @@ bool TracePlot::eventFilter(QObject* object, QEvent* event)
                         alignToClk(invTransform(xBottom, mouseEvent->x()),
                                    navigator->GeneralTraceInfo().clkPeriod));
                     enterZoomMode();
+                }
+                else if (keyPressData.altPressed)
+                {
+                    mouseDownData.zoomSpan.setBegin(
+                        alignToClk(invTransform(xBottom, mouseEvent->x()),
+                                   navigator->GeneralTraceInfo().clkPeriod));
+                    mouseDownData.zoomSpan.setEnd(
+                        alignToClk(invTransform(xBottom, mouseEvent->x()),
+                                   navigator->GeneralTraceInfo().clkPeriod));
+                    enterMeasureMode();
                 }
                 else
                 {
@@ -850,6 +892,11 @@ bool TracePlot::eventFilter(QObject* object, QEvent* event)
                     replot();
                     return true;
                 }
+                else if (mouseDownData.mouseIsDownForMeasuring)
+                {
+                    mouseDownData.mouseIsDownForMeasuring = false;
+                    return true;
+                }
             }
             break;
         }
@@ -864,16 +911,24 @@ bool TracePlot::eventFilter(QObject* object, QEvent* event)
                 navigator->navigateToTime(mouseDownData.mouseDownTime + deltaTime);
                 return true;
             }
-            else if (mouseDownData.mouseIsDownForZooming)
+            else if (mouseDownData.mouseIsDownForZooming || mouseDownData.mouseIsDownForMeasuring)
             {
                 mouseDownData.zoomSpan.setEnd(alignToClk(invTransform(xBottom, mouseEvent->x()),
                                                          navigator->GeneralTraceInfo().clkPeriod));
                 if (mouseDownData.zoomSpan.Begin() < mouseDownData.zoomSpan.End())
-                    zoomZone->setInterval(mouseDownData.zoomSpan.Begin(),
-                                          mouseDownData.zoomSpan.End());
+                {
+                    if (mouseDownData.mouseIsDownForZooming)
+                        zoomZone->setInterval(mouseDownData.zoomSpan.Begin(), mouseDownData.zoomSpan.End());
+                    else
+                        measureZone->setInterval(mouseDownData.zoomSpan.Begin(), mouseDownData.zoomSpan.End());
+                }
                 else
-                    zoomZone->setInterval(mouseDownData.zoomSpan.End(),
-                                          mouseDownData.zoomSpan.Begin());
+                {
+                    if (mouseDownData.mouseIsDownForZooming)
+                        zoomZone->setInterval(mouseDownData.zoomSpan.End(), mouseDownData.zoomSpan.Begin());
+                    else
+                        measureZone->setInterval(mouseDownData.zoomSpan.End(), mouseDownData.zoomSpan.Begin());
+                }
 
                 replot();
             }

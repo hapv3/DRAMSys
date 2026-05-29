@@ -41,6 +41,10 @@
 #include "tracefiletab.h"
 #include "ui_traceanalyzer.h"
 
+#ifdef EXTENSION_ENABLED
+#include "extension/plots.h"
+#endif
+
 #include <QCloseEvent>
 #include <QDateTime>
 #include <QFileDialog>
@@ -237,14 +241,15 @@ void TraceAnalyzer::statusChanged(const QString& message)
 
 void TraceAnalyzer::on_actionMetrics_triggered()
 {
-#ifndef EXTENSION_ENABLED
-        showExtensionDisclaimerMessageBox();
+    if (openedTraceFiles.size() == 0)
         return;
-#endif
-
+#ifdef EXTENSION_ENABLED
+    TraceAnalyzerExtension::showAdvancedMetrics(openedTraceFiles.values());
+#else
     evaluationTool.raise();
     evaluationTool.activateWindow();
     evaluationTool.showAndEvaluateMetrics(openedTraceFiles.values());
+#endif
 }
 
 void TraceAnalyzer::on_actionAbout_triggered()

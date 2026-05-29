@@ -126,6 +126,7 @@ private:
     TraceDrawingProperties drawingProperties;
     TracePlotItem* tracePlotItem;
     QwtPlotZoneItem* zoomZone;
+    QwtPlotZoneItem* measureZone;
     std::vector<std::shared_ptr<Transaction>> transactions;
     QueryEditor* queryEditor;
     QMenu* contextMenu;
@@ -168,6 +169,8 @@ private:
     void zoomOut(traceTime zoomCenter);
     void exitZoomMode();
     void enterZoomMode();
+    void exitMeasureMode();
+    void enterMeasureMode();
 
     /* keyboard an mouse events
      *
@@ -207,8 +210,8 @@ private:
 
     struct KeyPressData
     {
-        bool ctrlPressed, shiftPressed;
-        KeyPressData() : ctrlPressed(false), shiftPressed(false) {}
+        bool ctrlPressed, shiftPressed, altPressed;
+        KeyPressData() : ctrlPressed(false), shiftPressed(false), altPressed(false) {}
     };
 
     struct MouseDownData
@@ -218,11 +221,13 @@ private:
         int mouseDownX;
         bool mouseIsDownForDragging;
         bool mouseIsDownForZooming;
+        bool mouseIsDownForMeasuring;
         MouseDownData() :
             mouseDownTime(0),
             mouseDownX(0),
             mouseIsDownForDragging(false),
-            mouseIsDownForZooming(false)
+            mouseIsDownForZooming(false),
+            mouseIsDownForMeasuring(false)
         {
         }
     };

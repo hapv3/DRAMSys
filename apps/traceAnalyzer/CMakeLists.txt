@@ -105,7 +105,7 @@ install(TARGETS TraceAnalyzer)
 ########################################
 
 option(DRAMSYS_BUILD_TRACE_ANALYZER_EXTENSION
-    "Build premium Trace Analyzer extension (Latency / Power analysis)" OFF)
+    "Build premium Trace Analyzer extension (Latency / Power analysis)" ON)
 
 if(DRAMSYS_BUILD_TRACE_ANALYZER_EXTENSION)
     add_library(traceanalyzer_extension STATIC
@@ -116,6 +116,8 @@ if(DRAMSYS_BUILD_TRACE_ANALYZER_EXTENSION)
         extension/power/poweranalysis.cpp
         extension/power/powerplot.cpp
         extension/power/powerworker.cpp
+        extension/metrics/metricsengine.cpp
+        extension/metrics/advancedmetricsui.cpp
     )
 
     # Expose EXTENSION_ENABLED so the open-source #ifdef stubs are compiled in.
@@ -137,6 +139,17 @@ if(DRAMSYS_BUILD_TRACE_ANALYZER_EXTENSION)
 
     # Link the extension into the main executable.
     target_link_libraries(TraceAnalyzer PRIVATE traceanalyzer_extension)
+    
+    # Setup GTest for JEDEC Metrics Verification
+    if(DRAMSYS_BUILD_TESTS)
+        find_package(GTest REQUIRED)
+        add_executable(tests_traceanalyzer tests/metricstests.cpp)
+        target_link_libraries(tests_traceanalyzer 
+            PRIVATE traceanalyzer_extension GTest::gtest GTest::gtest_main Qt5::Sql Qt5::Core
+        )
+        
+        gtest_discover_tests(tests_traceanalyzer WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+    endif()
 
     message(STATUS "TraceAnalyzer: premium extension ENABLED")
 else()

@@ -48,10 +48,7 @@ QwtText TracePlotMouseLabel::trackerText(const QPoint& point) const
 {
     if (mode == MouseLabelMode::AbsoluteTime)
     {
-        traceTime mouseTime =
-            static_cast<traceTime>(traceplot->invTransform(traceplot->xBottom, point.x()));
-        return QwtText(prettyFormatTime(alignToClk(mouseTime, clkPeriod)) + "(" +
-                       formatInClks(mouseTime, clkPeriod) + ")");
+        return QwtText("");
     }
     else if (mode == MouseLabelMode::Timedifference)
     {

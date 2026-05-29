@@ -11,6 +11,7 @@
 
 #include "latency/latencyanalysis.h"
 #include "power/poweranalysis.h"
+#include "metrics/advancedmetricsui.h"
 #include "businessObjects/tracetime.h"
 
 #include <QLabel>
@@ -24,6 +25,19 @@ class QwtPlot;
 
 namespace TraceAnalyzerExtension
 {
+
+/**
+ * Adapter for advanced metrics UI
+ */
+inline void showAdvancedMetrics(const QList<QString>& paths)
+{
+    // Simple singleton to keep the window alive
+    static AdvancedMetricsUI* ui = nullptr;
+    if (!ui) {
+        ui = new AdvancedMetricsUI();
+    }
+    ui->showAndEvaluateMetrics(paths);
+}
 
 /**
  * Adapter for latencyAnalysis: reads clkPeriod from GeneralInfo and
